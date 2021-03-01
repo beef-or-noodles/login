@@ -20,7 +20,19 @@
                 </div>
                 <div class="zcBox" :class="{right:activeMove}">
                     <div class="iconLoad">
-                        上传图片
+                        <img v-if="imgurl" :src="imgurl" alt="">
+                        <input type="file" id="headIcon" class="headIcon" />
+                        <div v-if="!imgurl" class="hint">
+                            头像
+                        </div>
+                        <h5-cropper
+                                ref="cropper"
+                                hide-input
+                                :option="option"
+                                @canceltailor='chanel'
+                                @getblobData="getblobData"
+                                @getFile="save"
+                        ></h5-cropper>
                     </div>
 
                     <w-input title="用户名" placeholder="输入您的昵称" v-model="userName1"></w-input>
@@ -51,19 +63,20 @@
 </template>
 <script>
     import {
-        mapMutations,mapGetters
+        mapMutations
     } from 'vuex'
-    import {
-        routerMenuData
-    } from '@/tool/public/routerData.js' //配置的路由表
     import wInput from '../../components/wInput'
-
+    import H5Cropper  from 'vue-cropper-h5'
+    import lrz from "lrz";
     export default {
         components: {
-            wInput
+            wInput,H5Cropper
         },
         data() {
             return {
+                option:{
+                    url:'',
+                },
                 userName: '',
                 password: '',
 
@@ -90,10 +103,41 @@
             if(query.hasOwnProperty("url")){
                 this.query = query
             }
+            let _this = this
+            document.getElementById("headIcon").onchange = function(e){
+                setTimeout(() => {
+                    _this.$refs.cropper.loadFile(this.files[0])
+                }, 0);
+            }
         },
         methods: {
             // 将用户信息保存在vuex里面
             ...mapMutations(["setToast"]),
+            // 取消
+            chanel() {
+                this.option.img = ''
+                this.blob = ''
+            },
+            getblobData(data){
+               //console.log(data);
+            },
+            save(file) {
+                const obj = {
+                    file: file,
+                }
+                let _this = this
+                lrz(obj.file).then(function (rst) {
+                    // 处理成功会执行
+                    obj.file = rst.file
+                    _this.$uploadImg("http://39.99.193.63:8889/api/upload",obj.file).then(data=>{
+                        _this.imgurl = data.path
+                        _this.chanel()
+                        _this.setToast({show:true,icon:"success",title:"上传成功"})
+                    }).catch(err=>{
+                        _this.setToast({show:true,icon:"warning",title:"上传失败"})
+                    })
+                }).catch(function (err) {})
+            },
             getCode() {
                 if (this.codeTxt !== "获取证码") return;
                 let params = {
@@ -323,8 +367,34 @@
         }
     }
     .iconLoad{
-        display: flex;
-        align-items: center;
-        justify-content: center;
+        border: 2px dashed #ff7268;
+        width: 80px;
+        border-radius: 6px;
+        margin: 0 auto;
+        position: relative;
+        overflow: hidden;
+        height: 80px;
+        img{
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+        .hint{
+          position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%,-50%);
+            color: white;
+            text-align: justify;
+        }
+        .headIcon{
+            z-index: 99;
+            width: 80px;
+            height: 80px;
+            opacity: 0;
+        }
     }
+
 </style>
