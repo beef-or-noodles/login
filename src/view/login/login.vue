@@ -129,7 +129,7 @@
                 lrz(obj.file).then(function (rst) {
                     // 处理成功会执行
                     obj.file = rst.file
-                    _this.$uploadImg("http://39.99.193.63:8889/api/upload",obj.file).then(data=>{
+                    _this.$uploadImg("http://39.99.193.63:8889/api/upload",obj.file,"user_pic_name").then(data=>{
                         _this.imgurl = data.path
                         _this.chanel()
                         _this.setToast({show:true,icon:"success",title:"上传成功"})

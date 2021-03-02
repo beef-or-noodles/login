@@ -133,7 +133,7 @@ export function get(url) {
 };
 
 // 上传图片
-export function uploadImg(url, data) {
+export function uploadImg(url, data,dirname="") {
     let param = new FormData(); // 创建form对象
     param.append("file", data); //) // 通过append向form对象添加数据
     return new Promise((resolve, redect) => {
@@ -142,7 +142,8 @@ export function uploadImg(url, data) {
             url: url,
             data: param,
             headers: {
-                "Content-Type": "multipart/form-data"
+                "Content-Type": "multipart/form-data",
+                "dirname":dirname
             },
         }).then(response => {
             if (response.data.code == 200) {
