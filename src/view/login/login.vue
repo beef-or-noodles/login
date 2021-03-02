@@ -76,6 +76,9 @@
             return {
                 option:{
                     url:'',
+                    original:false,
+                    autoCropWidth:120,
+                    autoCropHeight:120
                 },
                 userName: '',
                 password: '',
